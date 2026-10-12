@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Carpenters Fiji Loyalty Platform – Production Testing Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#e9eff0;--panel:#fff;--ink:#12262b;--mute:#5b7076;--line:#d3dde0;--deep:#0d3b45;--lagoon:#1b7f8c;--pass:#1d7a46;--passbg:#dff3e7;--warn:#a65d00;--warnbg:#fdeccb;--fail:#b3261e;--failbg:#fbdcd9;--info:#34588a;--infobg:#e1eaf7;--r:6px}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font:15px/1.55 "IBM Plex Sans",system-ui,sans-serif;background:var(--bg);color:var(--ink)}
+h1,h2,h3{font-family:"Bricolage Grotesque","IBM Plex Sans",sans-serif;margin:0;line-height:1.15}
+.app{display:grid;grid-template-columns:268px 1fr;min-height:100vh}
+nav{background:var(--deep);color:#d6e8eb;padding:24px 14px;position:sticky;top:0;height:100vh;overflow:auto}
+nav .brand{padding:0 10px 18px;border-bottom:1px solid #ffffff22;margin-bottom:14px}
+nav .brand b{font:700 18px "Bricolage Grotesque",sans-serif;color:#fff;display:block}
+nav .brand span{font-size:12.5px;color:#9fc3c9}
+.tab{display:block;width:100%;text-align:left;background:none;border:0;border-left:4px solid transparent;color:inherit;font:inherit;padding:10px 10px 10px 12px;cursor:pointer;border-radius:0 var(--r) var(--r) 0}
+.tab:hover{background:#ffffff12}
+.tab[aria-selected=true]{background:#ffffff1f;color:#fff;border-left-color:#f2b84b}
+.tab:focus-visible,.pill-btn:focus-visible{outline:2px solid #f2b84b;outline-offset:2px}
+.tab .t{display:block;font-weight:600}
+.tab .s{display:flex;align-items:center;gap:7px;font-size:12.5px;color:#9fc3c9;margin-top:2px}
+.dot{width:9px;height:9px;border-radius:50%;flex:none}
+.dot.pass{background:#4cc77f}.dot.warn{background:#f2b84b}.dot.fail{background:#ff7a70}
+main{padding:34px clamp(18px,4vw,48px) 60px;max-width:1180px;width:100%}
+.head{display:flex;flex-wrap:wrap;gap:14px 28px;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.head h1{font-size:clamp(26px,3.4vw,38px);color:var(--deep)}
+.meta{color:var(--mute);font-size:13.5px;margin-top:6px}
+.verdict{padding:10px 16px;border-radius:var(--r);font-weight:600;max-width:340px}
+.verdict.pass{background:var(--passbg);color:var(--pass)}.verdict.warn{background:var(--warnbg);color:var(--warn)}.verdict.fail{background:var(--failbg);color:var(--fail)}
+.purpose{max-width:74ch;margin:18px 0 22px;color:#2c4046}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:26px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-top:3px solid var(--lagoon);border-radius:var(--r);padding:12px 14px}
+.kpi b{display:block;font:700 24px "Bricolage Grotesque",sans-serif;color:var(--deep)}
+.kpi span{font-size:12.5px;color:var(--mute)}
+section.blk{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;margin-bottom:18px}
+section.blk h2{font-size:19px;margin-bottom:12px;color:var(--deep)}
+.scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th{text-align:left;font-weight:600;color:var(--mute);font-size:12.5px;border-bottom:2px solid var(--line);padding:7px 10px;white-space:nowrap}
+td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:500}
+.pill{display:inline-block;padding:1px 9px;border-radius:99px;font-size:12px;font-weight:600;white-space:nowrap}
+.pill.pass{background:var(--passbg);color:var(--pass)}.pill.warn{background:var(--warnbg);color:var(--warn)}.pill.fail{background:var(--failbg);color:var(--fail)}.pill.info{background:var(--infobg);color:var(--info)}
+.bars{display:grid;gap:9px}
+.bar{display:grid;grid-template-columns:110px 1fr;align-items:center;gap:12px;font-size:13.5px}
+.track{position:relative;height:26px;background:#eef3f4;border-radius:4px}
+.fill{height:100%;border-radius:4px;background:var(--lagoon);display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:#fff;font-weight:600;font-size:12.5px;min-width:max-content}
+.fill.over{background:var(--fail)}.fill.small{justify-content:flex-start;padding:0 0 0 0}
+.out{position:absolute;top:50%;transform:translateY(-50%);margin-left:6px;font-size:12.5px;font-weight:600;color:var(--deep)}
+.thr{position:absolute;top:-4px;bottom:-4px;border-left:2px dashed var(--warn)}
+.thr i{position:absolute;top:-17px;left:4px;font-size:11.5px;color:var(--warn);font-style:normal;white-space:nowrap}
+.legend{font-size:12.5px;color:var(--mute);margin-top:22px}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:18px}
+.two>section{margin-bottom:0}
+.find{border:1px solid var(--line);border-left:4px solid var(--info);border-radius:var(--r);padding:11px 14px;margin-bottom:10px;background:#fafcfc}
+.find.warn{border-left-color:#e09a1a}.find.pass{border-left-color:var(--pass)}.find.fail{border-left-color:var(--fail)}
+.find .top{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:3px}
+.find .id{font:600 13px "IBM Plex Sans";color:var(--mute)}
+.find b{font-weight:600}
+.find p{margin:2px 0 0;color:#2c4046;font-size:14px;max-width:90ch}
+.note{background:var(--warnbg);border-radius:var(--r);padding:11px 14px;color:#5c3700;font-size:14px;margin-bottom:18px}
+.steps{margin:0;padding-left:0;list-style:none;border-left:2px solid var(--line)}
+.steps li{padding:0 0 10px 16px;position:relative}
+.steps li:before{content:"";position:absolute;left:-6px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--lagoon)}
+.steps b{font-variant-numeric:tabular-nums;margin-right:8px}
+.ov{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;margin-bottom:22px}
+.ovc{text-align:left;font:inherit;color:inherit;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px;cursor:pointer;border-top:4px solid var(--pass)}
+.ovc.warn{border-top-color:#e09a1a}.ovc:hover{border-color:var(--lagoon)}
+.ovc h3{font-size:17px;margin-bottom:4px}.ovc p{margin:8px 0 0;font-size:13.5px;color:#2c4046}.ovc small{color:var(--mute)}
+@media(max-width:820px){
+.app{display:block}
+nav{position:static;height:auto;padding:12px 8px;display:flex;overflow-x:auto;gap:4px;align-items:stretch}
+nav .brand{display:none}
+.tab{border-left:0;border-bottom:3px solid transparent;border-radius:var(--r) var(--r) 0 0;width:auto;min-width:150px;flex:none}
+.tab[aria-selected=true]{border-bottom-color:#f2b84b}
+.bar{grid-template-columns:78px 1fr}
+.two{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:no-preference){.panel-in{animation:in .25s ease-out}@keyframes in{from{opacity:.4}to{opacity:1}}}
+</style>
+</head>
+<body>
+<div class="app">
+<nav role="tablist" aria-label="Test phases" id="nav">
+ <div class="brand"><b>Carpenters Fiji Loyalty</b><span>CS400 production test results<br>Tapnaanshu Lal · 5–6 Oct 2026</span></div>
+</nav>
+<main id="main" role="tabpanel" tabindex="-1"></main>
+</div>
+
+<script>
+const T=[
+{id:"api",label:"Backend API & integration",date:"5 Oct 2026",st:"warn",verdict:"PASS WITH FINDINGS",
+ purpose:"Verified production API behaviour, API-to-database integration, SQL Server health, logging and Azure Blob readiness before performance testing began.",
+ summary:"Core path (HTTPS → IIS → ASP.NET Core → EF Core → SQL Server) validated. Blob integration not configured in the deployed API.",
+ kpis:[["57.05 ms","Avg external API response"],["2–3 ms","API database health"],["82.21 ms","SQL command baseline"],["0","Blocking sessions"],["72 / 72 MB","Data / log file"]],
+ blocks:[
+ {t:"Test results",cols:["Area","Test","Observed result","Status"],rows:[
+ ["Infrastructure","Public API health","GET /api/health returned 200; Healthy, database Connected","PASS"],
+ ["Infrastructure","IIS site, app pool, services","CarpentersRewardsAPI running; MSSQLSERVER, W3SVC, WAS all Running (Automatic)","PASS"],
+ ["Infrastructure","SQL listener","TCP 1433 listening on IPv4 and IPv6","PASS"],
+ ["SQL integration","Database state and direct query","ONLINE / MULTI_USER; query succeeded; API cross-check Connected","PASS"],
+ ["SQL integrity","DBCC CHECKDB","Completed with no consistency errors; no blocking","PASS"],
+ ["API behaviour","Invalid route / wrong method","404 for unknown route; 405 for POST on GET-only route","PASS"],
+ ["API behaviour","HTTPS enforcement","HTTP returned 301 to HTTPS","PASS"],
+ ["API behaviour","CORS","Allowed origin got 204 + header; https://example.com got no Allow-Origin","PASS"],
+ ["API behaviour","Swagger / OpenAPI","Both endpoints return 404 in production","INFO"],
+ ["Logging","App and IIS logs","JSON logs updating; 404/405 logged with trace ID; login POSTs returned 200","PASS"],
+ ["Blob storage","DNS, TCP 443, public access","Resolves, reachable, anonymous listing denied (PublicAccessNotPermitted)","PASS"],
+ ["Blob storage","Backend configuration","No Blob config in appsettings, app-pool env vars or web.config","FINDING"],
+ ["Blob storage","Application-to-Blob integration","Could not be validated","NOT VERIFIED"]]},
+ {t:"External health-check timings (ms)",bars:[["Check 1",70.92],["Check 2",53.84],["Check 3",54.36],["Check 4",50.54],["Check 5",55.59]],unit:" ms",note:"Average 57.05 ms with no load."},
+ {t:"Findings",finds:[
+ ["P4-F01","Medium","Backend-to-Blob integration not configured","Blob Storage is reachable and private, but the deployed API has no storage configuration. Upload/download behaviour is unverified. Configure access with secret management or managed identity before testing file operations.","OPEN / MONITOR"],
+ ["P4-F02","Medium","API startup depends on SQL readiness","An earlier IIS 500.30 failure came from a database query running before SQL accepted connections. Add retry/backoff or deferred initialisation.","OPEN / MONITOR"],
+ ["P4-F03","Low","Data Protection keys are ephemeral","Keys are held in memory, so protected data may be lost on restart. Persist keys if cookies, reset flows or anti-forgery need continuity.","OPEN / MONITOR"],
+ ["P4-F04","Low","Hangfire non-graceful shutdown","Warning recorded while the backend was restarted during diagnostics. Recheck under controlled restarts in recovery testing.","OPEN / MONITOR"]]}]},
+
+{id:"load",label:"Load testing",date:"5 Oct 2026",st:"pass",verdict:"PASS",
+ purpose:"Measured latency and throughput of the production API and database-health path at 5, 20, 50, 100 and 200 virtual users using Grafana k6.",
+ summary:"0% failures at every level; P95 never above 61 ms; large CPU and disk headroom at 200 VUs.",
+ kpis:[["200 VUs","Highest load tested"],["28,805","Requests at 200 VUs"],["137.07/s","Throughput at 200 VUs"],["60.10 ms","P95 at 200 VUs"],["0%","Request failures"],["22.71%","Peak VM CPU"]],
+ blocks:[
+ {note:"Scope limitation: the workload exercised /api/health only. Login, redemption, reporting and other business workflows need separate scenarios before end-to-end capacity claims."},
+ {t:"Results by load level",cols:["VUs","Requests","Req/s","Avg ms","P95 ms","Max ms","Failures","Checks","Verdict"],rows:[
+ ["5","224","3.69","42.42","48.10","72.02","0.00%","100%","PASS"],["20","1,551","15.45","42.45","48.44","73.14","0.00%","100%","PASS"],["50","4,351","36.11","41.56","45.52","434.52","0.00%","100%","PASS"],["100","10,112","67.16","43.71","52.23","159.02","0.00%","100%","PASS"],["200","28,805","137.07","44.30","60.10","120.51","0.00%","100%","PASS"]]},
+ {two:[
+  {t:"P95 latency (target < 500 ms)",bars:[["5 VUs",48.10],["20 VUs",48.44],["50 VUs",45.52],["100 VUs",52.23],["200 VUs",60.10]],unit:" ms",thr:500},
+  {t:"Throughput (requests/second)",bars:[["5 VUs",3.69],["20 VUs",15.45],["50 VUs",36.11],["100 VUs",67.16],["200 VUs",137.07]],unit:" req/s"}]},
+ {t:"Azure VM and SQL Server during load",cols:["VUs","Avg CPU %","Peak CPU %","Min free RAM MB","Peak disk %","SQL sessions","Blocking"],rows:[
+ ["5","2.77","13.54","1,245","0.53","2","0"],["20","2.12","3.55","1,165","0.62","9","0"],["50","4.17","7.47","1,111","0.69","9","0"],["100","7.63","21.30","1,122","0.52","13","0"],["200","12.65","22.71","1,172","1.45","26","0"]]},
+ {t:"Findings",finds:[
+ ["F5-01–05","","Stable latency, zero failures, linear throughput, no blocking, resource headroom","All five acceptance criteria passed at every load level.","PASS"],
+ ["F5-06","","50-VU latency outlier","One 434.52 ms maximum; P95 stayed low and there were no failures, so it is treated as an isolated spike.","INFO"],
+ ["F5-07","","Endpoint coverage limitation","Authenticated reads/writes and loyalty transactions need their own performance scenarios.","LIMITATION"]]}]},
+
+{id:"stress",label:"Stress & spike testing",date:"6 Oct 2026",st:"warn",verdict:"COMPLETED – SPIKE LATENCY FINDING",
+ purpose:"Determined how the API behaves under sustained stress (300–500 VUs), a sudden 20→500 VU spike, and post-load recovery, without changing production configuration.",
+ summary:"Sustained stress passed to 500 VUs. The spike run failed the P95 target (789.40 ms vs 500 ms) but recovered automatically.",
+ kpis:[["500 VUs","Sustained stress passed"],["299.67/s","Best throughput (500 VUs)"],["789.40 ms","Spike P95 (target 500)"],["0.04%","Spike failure rate"],["10 / 10","Recovery checks healthy"]],
+ blocks:[
+ {note:"An initial 300-VU run immediately after a service restart hit HTTP 500.30 because SQL Server was still starting. It was excluded from capacity conclusions and logged as a resilience finding."},
+ {t:"Sustained stress results",cols:["Load","Requests","Req/s","Avg ms","P95 ms","Max","Fail %","Result"],rows:[
+ ["300 VUs","53,201","177.24","241.55","198.81","32.64 s","0.04","PASS"],["400 VUs","82,256","228.19","240.26","459.53","23.99 s","0.02","PASS"],["450 VUs","91,103","216.47","486.16","413.54","60.00 s","0.49","PASS / degraded"],["500 VUs","144,087","299.67","186.46","200.93","34.80 s","0.02","PASS"],["Spike 20→500","22,655","118.88","635.46","789.40","15.67 s","0.04","FAIL (latency)"]]},
+ {two:[
+  {t:"P95 latency (target < 500 ms)",bars:[["300 VUs",198.81],["400 VUs",459.53],["450 VUs",413.54],["500 VUs",200.93],["Spike",789.40]],unit:" ms",thr:500},
+  {t:"Throughput (requests/second)",bars:[["300 VUs",177.24],["400 VUs",228.19],["450 VUs",216.47],["500 VUs",299.67],["Spike",118.88]],unit:" req/s"}]},
+ {t:"VM and database resources",cols:["Test","Avg CPU","Peak CPU","Min free RAM","Peak disk","SQL conn."],rows:[
+ ["300 VUs","15.34%","24.29%","953 MB","29.88%","100"],["400 VUs","18.40%","29.71%","1,098 MB","1.16%","100"],["450 VUs","16.83%","32.63%","1,014 MB","3.42%","100"],["500 VUs","23.23%","38.48%","1,104 MB","1.85%","100"],["Spike","9.62%","38.23%","1,123 MB","0.78%","Not sampled"]]},
+ {t:"Spike test detail (20→500 VUs in 10 s, held 60 s)",cols:["Median","P90","P95","Max","Checks passed","Interrupted"],rows:[["109.95 ms","232.23 ms","789.40 ms","15.67 s","99.95%","0"]]},
+ {t:"Post-spike recovery (no restart)",cols:["Measure","Result","Status"],rows:[
+ ["Health requests","10/10 HTTP 200; API and database Healthy","PASS"],["Average response","32.31 ms (21.18 ms excluding first)","PASS"],["SQL connections / blocking","14 / 0","PASS"],["Manual restart","Not required","PASS"]]},
+ {t:"Findings",finds:[
+ ["P6-F01","","No sustained breaking point through 500 VUs","500 VUs passed with 0.02% failures and P95 200.93 ms.","PASS"],
+ ["P6-F02","","Transient instability at 450 VUs","0.49% failures and a 60 s maximum, not reproduced at 500 VUs.","INFO"],
+ ["P6-F03","","Spike latency weakness","Latency, not availability, is the concern under abrupt concurrency growth. Resources were far from saturated, pointing to request-path contention.","FINDING"],
+ ["P6-F04","","Startup dependency on SQL","Add retry/backoff to startup initialisation.","FINDING"],
+ ["P6-F05","","SQL pool reached MaxPoolSize (100)","Monitor it. The 500-VU pass shows the pool is not proven to be the bottleneck, so avoid raising it without evidence.","INFO"]]}]},
+
+{id:"soak",label:"Soak & endurance testing",date:"6 Oct 2026",st:"pass",verdict:"PASS – STABLE / NO LEAK INDICATORS",
+ purpose:"Validated stability over 30 minutes at 200 VUs and looked for memory, connection, CPU or disk drift.",
+ summary:"352,588 requests, one failure, P95 132.73 ms. IIS and SQL memory stayed bounded; sessions fell back to 2 after the run.",
+ kpis:[["30 min","Held at 200 VUs"],["352,588","Total requests"],["172.82/s","Throughput"],["132.73 ms","P95 (target < 500)"],["1","Failed request (~0.00028%)"],["19.28%","Peak CPU"]],
+ blocks:[
+ {two:[
+  {t:"k6 endurance results",cols:["Metric","Result"],rows:[["Average / median","88.70 ms / 59.68 ms"],["P90 / P95","110.69 ms / 132.73 ms"],["Maximum","15.18 s (isolated outlier)"],["Checks succeeded","1,057,763 / 1,057,764"],["Interrupted iterations","0"],["Profile","2 min ramp, 30 min hold, 2 min ramp-down"]]},
+  {t:"Resource trends (70 samples)",cols:["Resource","Avg","Min","Max"],rows:[["CPU","12.45%","0.00%","19.28%"],["Available memory","1,172 MB","1,066 MB","1,208 MB"],["Disk time","0.28%","0.00%","0.94%"],["IIS worker memory","296.74 MB","271.01 MB","379.30 MB"],["SQL Server memory","396.64 MB","394.24 MB","400.54 MB"],["SQL connections","80","3","100"]]}]},
+ {t:"Memory ended near where it started",bars:[["IIS start",285.35],["IIS peak",379.30],["IIS end",306.55],["SQL start",394.24],["SQL peak",400.54],["SQL end",397.10]],unit:" MB",note:"No monotonic growth in either process, consistent with normal allocation and garbage collection."},
+ {t:"Post-soak recovery (no restart)",cols:["Check","Result","Status"],rows:[["Services and app pool","MSSQLSERVER, W3SVC, WAS Running; app pool Started","PASS"],["Health requests","10/10 HTTP 200, API and database Healthy","PASS"],["Average latency","28.41 ms (21.25 ms excluding first)","PASS"],["SQL connections / blocking","2 / 0","PASS"]]},
+ {t:"Findings",finds:[
+ ["P7-F01","","Endurance stability","200 VUs for 30 minutes with P95 132.73 ms.","PASS"],
+ ["P7-F02/03","","No IIS or SQL memory leak","IIS peaked at 379.30 MB and returned to about 306.55 MB; SQL varied by only a few MB.","PASS"],
+ ["P7-F04","","No SQL connection leak","Sessions reached the 100 ceiling, then declined to 50 and then 2.","PASS"],
+ ["P7-F05","","Isolated tail latency","15.18 s maximum despite strong P95. Retain request-level telemetry to correlate it.","INFO"],
+ ["P7-F06","","Automatic recovery confirmed","No restart needed.","PASS"],
+ ["Limits","","Scope","Tested /api/health only; 30 minutes cannot rule out defects that appear over hours or days.","LIMITATION"]]}]},
+
+{id:"recovery",label:"Recovery & resilience",date:"6 Oct 2026",st:"pass",verdict:"PASS – remediations retested",
+ purpose:"Determined whether the platform recovers safely from application, frontend, database and full-VM interruptions without data corruption or manual repair.",
+ summary:"All seven sections passed. Two weaknesses (frontend crash recovery, boot-order race with SQL) were fixed and retested.",
+ kpis:[["2.45 s","API app pool recovery"],["6.36 s","Frontend crash recovery"],["3.55 s","API after SQL restart"],["173.45 s","API after full VM reboot"],["0","Blocked sessions"]],
+ blocks:[
+ {t:"Test sections",cols:["ID","Test area","Key outcome","Result"],rows:[
+ ["9A","Recovery baseline","Healthy baseline recorded; API 5/5 passed; 4 connections; 0 blocked","PASS"],
+ ["9B","IIS / API app pool restart","Recovered automatically in about 2.45 s; 5/5 checks passed","PASS"],
+ ["9C","Frontend process crash","First test failed; fixed, then recovered in about 6.36 s","RESOLVED"],
+ ["9D","SQL Server interruption","API reconnected about 3.55 s after SQL returned, no IIS restart","PASS"],
+ ["9E","Full VM reboot","Startup-order issue fixed; frontend 37.28 s, API 173.45 s","RESOLVED"],
+ ["9F","Database integrity","ONLINE, MULTI_USER, FULL model; CHECKDB clean; 0 blocked","PASS"],
+ ["9G","Final validation","10/10 API and 5/5 frontend external checks passed","PASS"]]},
+ {t:"Recovery time by scenario (seconds)",bars:[["App pool restart",2.45],["SQL restart → API",3.55],["Frontend crash",6.36],["Frontend after reboot",37.28],["API after reboot",173.45]],unit:" s",note:"The reboot figure includes SQL startup and the deliberate readiness and stabilisation wait."},
+ {t:"Full VM reboot timeline (final retest)",steps:[["16:30:21","Outage detected"],["16:30:32","VM boot time"],["16:31:37","API startup task began"],["16:32:42","SQL and TCP 1433 readiness confirmed"],["16:33:02","API app pool recycled"],["16:33:11","Startup log confirmed Healthy / Connected"]]},
+ {t:"Findings and corrective actions",finds:[
+ ["P9-F01","","Frontend did not restart after Node.js crash","Cause: the batch wrapper did not return to its restart loop after npm.cmd. Fix: CALL npm.cmd, a 5-second restart loop and stronger task restart settings. Retest recovered in about 6.36 s.","RESOLVED"],
+ ["P9-F02","","API started before SQL was ready after a reboot","Startup failure terminated the worker and the API never recovered. Fix: a SYSTEM boot task that waits for SQL and TCP 1433, stabilises 20 s, recycles the pool and verifies /api/health (3 retries, 15 min limit).","RESOLVED"],
+ ["Limits","","Scope","Not a disaster-recovery test: no loss of VM, database files, region or storage account was simulated.","LIMITATION"]]}]},
+
+{id:"security",label:"Security & authorization",date:"6 Oct 2026",st:"pass",verdict:"PASS – two findings fixed during testing",
+ purpose:"Verified authentication, MFA, sessions, role and permission enforcement, customer privilege boundaries, CORS, HTTPS and browser security headers.",
+ summary:"No authentication bypass. Customers were denied admin routes. SuperAdmin permissions and missing headers were fixed and verified.",
+ kpis:[["401","Unauthenticated and forged tokens"],["403","Customer on admin routes"],["58","SuperAdmin policies after fix"],["301","HTTP → HTTPS on both sites"],["4","Security headers verified"]],
+ blocks:[
+ {two:[
+  {t:"Authentication and sessions",cols:["Test","Result","Status"],rows:[["Unauthenticated /auth/me, transactions, loyalty summary","401","PASS"],["Malformed bearer token","401","PASS"],["Forged SuperAdmin token","401","PASS"],["Valid customer login and /auth/me","200, AccountType Customer","PASS"],["SuperAdmin password stage","RequiresTwoFactor","PASS"],["SuperAdmin after valid 2FA","Authenticated session","PASS"]]},
+  {t:"Customer privilege boundaries",cols:["Endpoint","HTTP","Status"],rows:[["/customers/me/transactions","200","PASS"],["/customers/me/loyalty-summary","200","PASS"],["/customer/profile","200","PASS"],["/users","403","PASS"],["/merchants","403","PASS"],["/policies","403","PASS"],["/customers/{own-id}","403","PASS"]]}]},
+ {t:"Authorization data seeded (P8-F01)",cols:["Table","Before","After"],rows:[["Policies","0","58"],["PolicyProfiles","0","3"],["PolicyProfilePolicies","0","105"],["PolicyProfileAssignments","0","1"]]},
+ {two:[
+  {t:"CORS and HTTPS",cols:["Check","Result","Status"],rows:[["Origin https://evil.example","204, no Allow-Origin","PASS"],["Origin carpenters.procyonfiji.com","Allowed, credentials true","PASS"],["HTTP → HTTPS (API)","301","PASS"],["HTTP → HTTPS (frontend)","301","PASS"]]},
+  {t:"Security headers after fix",cols:["Header","API","Frontend"],rows:[["Strict-Transport-Security","max-age=31536000","max-age=31536000"],["X-Content-Type-Options","nosniff","nosniff"],["X-Frame-Options","DENY","SAMEORIGIN"],["Referrer-Policy","no-referrer","strict-origin-when-cross-origin"]]}]},
+ {t:"Findings",finds:[
+ ["P8-F01","","SuperAdmin had no effective policies","MFA worked but privileged routes returned 403 because the production seeder was disabled (Seed.Enabled defaulted to false). The existing seeder was run through a temporary config, 58 policies were verified, and the config was removed. Four privileged endpoints now return 200.","RESOLVED"],
+ ["P8-F02","","Browser security headers missing","HSTS, nosniff, X-Frame-Options and Referrer-Policy were absent on API and frontend. IIS was backed up, headers were configured and externally verified.","RESOLVED"],
+ ["P8-O01","","Development config in production publish directory","Remove appsettings.Development.json from production packages and rotate any reused credential.","RECOMMENDATION"],
+ ["Limits","","Scope","Not a penetration test. Merchant Admin, Branch Manager and Cashier scope isolation and two-customer IDOR tests were not run. Audit logging was excluded.","LIMITATION"]]}]}
+];
+
+const $=s=>document.querySelector(s);
+const cls=s=>{s=s.toUpperCase();return /^(PASS|RESOLVED)/.test(s)?(/DEGRADED/.test(s)?"warn":"pass"):/FAIL/.test(s)?"fail":/BASELINE|INFO/.test(s)?"info":/FINDING|NOT VERIFIED|OPEN|LIMITATION|REVIEW|RECOMMEND|MEDIUM|LOW/.test(s)?"warn":""};
+const pill=s=>{const c=cls(s);return c?`<span class="pill ${c}">${s}</span>`:s};
+const isStatus=v=>/^(PASS|FAIL|RESOLVED|BASELINE|INFO|FINDING|NOT VERIFIED|OPEN|LIMITATION|RECOMMENDATION)/.test(v);
+
+function table(b){return `<div class="scroll"><table><thead><tr>${b.cols.map(c=>`<th>${c}</th>`).join("")}</tr></thead><tbody>${b.rows.map(r=>`<tr>${r.map(v=>`<td>${isStatus(v)?pill(v):v}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`}
+
+function bars(b){
+  const vals=b.bars.map(x=>x[1]);const max=Math.max(...vals,b.thr?b.thr*1.12:0);
+  return `<div class="bars" ${b.thr?'style="margin-top:20px"':''}>${b.bars.map(([l,v])=>{
+    const w=v/max*100,over=b.thr&&v>b.thr,txt=(v>=100?v.toLocaleString(undefined,{maximumFractionDigits:2}):v)+b.unit;
+    return `<div class="bar"><span>${l}</span><div class="track"><div class="fill ${over?"over":""}" style="width:${Math.max(w,1.5)}%">${w>28?txt:""}</div>${w>28?"":`<span class="out" style="left:${w}%">${txt}</span>`}${b.thr?`<div class="thr" style="left:${b.thr/max*100}%">${l===b.bars[0][0]?`<i>target ${b.thr}${b.unit}</i>`:""}</div>`:""}</div></div>`}).join("")}</div>${b.note?`<p class="legend">${b.note}</p>`:""}`}
+
+function finds(b){return b.finds.map(([id,sev,t,p,st])=>`<div class="find ${cls(st)}"><div class="top"><span class="id">${id}</span><b>${t}</b>${pill(st)}${sev?pill(sev):""}</div><p>${p}</p></div>`).join("")}
+function steps(b){return `<ul class="steps">${b.steps.map(([a,t])=>`<li><b>${a}</b>${t}</li>`).join("")}</ul>`}
+
+function block(b){
+  if(b.note&&!b.t&&!b.bars)return `<div class="note">${b.note}</div>`;
+  if(b.two)return `<div class="two">${b.two.map(block).join("")}</div>`;
+  const inner=b.cols?table(b):b.bars?bars(b):b.finds?finds(b):b.steps?steps(b):"";
+  return `<section class="blk"><h2>${b.t}</h2>${inner}</section>`}
+
+function overview(){
+  const n=T.length;
+  return `<div class="head"><div><h1>Production testing overview</h1><div class="meta">Carpenters Fiji Coalition Loyalty Program · CS400 Industry Experience Project · Azure Windows Server / IIS / SQL Server</div></div></div>
+  <p class="purpose">Six production test phases ran on 5–6 October 2026. Select a phase below or in the sidebar for full results.</p>
+  <div class="kpis"><div class="kpi"><b>${n}</b><span>Test phases completed</span></div><div class="kpi"><b>5 of 6</b><span>Clean PASS or PASS with fixes retested</span></div><div class="kpi"><b>500 VUs</b><span>Highest sustained load passed</span></div><div class="kpi"><b>0</b><span>Open critical findings</span></div></div>
+  <div class="ov">${T.map(t=>`<button class="ovc ${t.st}" data-go="${t.id}"><h3>${t.label}</h3><small>${t.date}</small><p><span class="pill ${t.st}">${t.verdict}</span></p><p>${t.summary}</p></button>`).join("")}</div>
+  <section class="blk"><h2>Items to carry forward</h2>
+  <div class="find warn"><div class="top"><b>Spike latency</b>${pill("FINDING")}</div><p>A 20→500 VU surge pushed P95 to 789.40 ms (target 500 ms). Add telemetry for SQL pool usage, request queueing and wait statistics.</p></div>
+  <div class="find warn"><div class="top"><b>Blob Storage not configured in the API</b>${pill("OPEN / MONITOR")}</div><p>Application-to-Blob integration remains unverified.</p></div>
+  <div class="find warn"><div class="top"><b>Startup dependency on SQL</b>${pill("OPEN / MONITOR")}</div><p>Mitigated by the dependency-aware boot task; app-level retry/backoff is still recommended.</p></div>
+  <div class="find warn"><div class="top"><b>Test coverage</b>${pill("LIMITATION")}</div><p>Load, stress and soak runs targeted /api/health only. Authenticated, transactional workloads still need their own scenarios.</p></div></section>`}
+
+function view(id){
+  if(id==="overview")return overview();
+  const t=T.find(x=>x.id===id);
+  return `<div class="head"><div><h1>${t.label}</h1><div class="meta">Tested ${t.date}${t.id==="recovery"?"":" · Prepared by Tapnaanshu Lal"}</div></div><div class="verdict ${t.st}">${t.verdict}</div></div>
+  <p class="purpose">${t.purpose}</p><div class="kpis">${t.kpis.map(([v,l])=>`<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("")}</div>${t.blocks.map(block).join("")}`}
+
+const nav=$("#nav"),main=$("#main");
+const all=[{id:"overview",label:"Overview",st:"",sub:"All six phases"},...T.map(t=>({id:t.id,label:t.label,st:t.st,sub:t.verdict.split(" – ")[0]}))];
+nav.insertAdjacentHTML("beforeend",all.map(a=>`<button class="tab" role="tab" id="tab-${a.id}" data-id="${a.id}"><span class="t">${a.label}</span><span class="s">${a.st?`<i class="dot ${a.st}"></i>`:""}${a.sub}</span></button>`).join(""));
+
+function show(id,push){
+  if(!all.some(a=>a.id===id))id="overview";
+  document.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected",b.dataset.id===id));
+  main.innerHTML=`<div class="panel-in">${view(id)}</div>`;
+  main.setAttribute("aria-labelledby","tab-"+id);
+  if(push!==false)history.replaceState(null,"","#"+id);
+  window.scrollTo(0,0);
+  document.getElementById("tab-"+id).scrollIntoView({block:"nearest",inline:"nearest"});
+}
+nav.addEventListener("click",e=>{const b=e.target.closest(".tab");if(b)show(b.dataset.id)});
+main.addEventListener("click",e=>{const b=e.target.closest("[data-go]");if(b)show(b.dataset.go)});
+nav.addEventListener("keydown",e=>{
+  const ids=all.map(a=>a.id),cur=ids.indexOf(location.hash.slice(1)>""?location.hash.slice(1):"overview");
+  let n=null;
+  if(e.key==="ArrowDown"||e.key==="ArrowRight")n=(cur+1)%ids.length;
+  if(e.key==="ArrowUp"||e.key==="ArrowLeft")n=(cur-1+ids.length)%ids.length;
+  if(n!==null){e.preventDefault();show(ids[n]);document.getElementById("tab-"+ids[n]).focus()}
+});
+addEventListener("hashchange",()=>show(location.hash.slice(1),false));
+show(location.hash.slice(1)||"overview",false);
+</script>
+</body>
+</html>
